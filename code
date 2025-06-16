@@ -123,4 +123,32 @@ plot(cal_OS_training_36, col="#f05326", errbar.col="#f05326",par.corrected=list(
 plot(cal_OS_training_60, col="#fa4343", errbar.col="#fa4343",par.corrected=list(col="#fa4343") ,xlim=c(0,1),ylim=c(0,1))
 
 
+##Codes for decision curve of the nomogram
+library(dcurves)
+library(foreign)
+library(survival)
+library(dplyr)
+model_1_DFS<-coxph(Surv(DFStimes,DFSstatus)~ MTMS+Tstage+Nstage+Mstage,data= training_data)
+model_2_DFS <- coxph(Surv(DFStimes,DFSstatus)~ Tstage+Nstage+Mstage+Differentiation_status,data= training_data)
+model_3_DFS <- coxph(Surv(DFStimes,DFSstatus)~ TNMstage,data= training_data)
+training_data $pr_failuref1 = c(1- (summary(survfit(model_1_DFS, newdata= training_data), times=60)$surv))
+training_data $pr_failuref2 = c(1- (summary(survfit(model_2_DFS, newdata= training_data), times=60)$surv))
+training_data $pr_failuref3 = c(1- (summary(survfit(model_3_DFS, newdata= training_data), times=60)$surv))
+dca(Surv(DFStimes,DFSstatus) ~ pr_failuref1+pr_failuref2+ pr_failuref3, 
+                      data = training_data,
+                      time = 60,
+                      thresholds = 1:100 / 100) %>%
+  plot(smooth = T)
+
+model_1_OS<-coxph(Surv(OStimes,OSstatus)~ MTMS+Tstage+Nstage+Mstage,data= training_data)
+model_2_OS <- coxph(Surv(OStimes, OSstatus)~ Tstage+Nstage+Mstage+Differentiation_status,data= training_data)
+model_3_OS <- coxph(Surv(OStimes, OSstatus)~ TNMstage,data= training_data)
+training_data $pr_failuref1 = c(1- (summary(survfit(model_1_OS, newdata= training_data), times=60)$surv))
+training_data $pr_failuref2 = c(1- (summary(survfit(model_2_OS, newdata= training_data), times=60)$surv))
+training_data $pr_failuref3 = c(1- (summary(survfit(model_3_OS, newdata= training_data), times=60)$surv))
+dca(Surv(OStimes,OSstatus) ~ pr_failuref1+pr_failuref2+ pr_failuref3, 
+                      data = training_data,
+                      time = 60,
+                      thresholds = 1:100 / 100) %>%
+  plot(smooth = T)
 
