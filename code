@@ -86,7 +86,7 @@ library(rms)
 rcorrcens(Surv(DFStimes,DFSstatus) ~ predict(model_DFS), data = training_data)
 rcorrcens(Surv(OStimes,OSstatus) ~ predict(model_OS), data = training_data)
 
-#Codes for calculating C-index in internal validation cohort
+##Codes for calculating C-index in internal validation cohort
 model_DFS_intern_val <- cph(Surv(DFStimes,DFSstatus)~predict(model_DFS, newdata = internal_validation_data), x = T, y = T, surv = T,time.inc = 60, data = internal_validation_data)
 rcorrcens(Surv(DFStimes,DFSstatus) ~ predict(model_DFS, newdata = internal_validation_data), data = internal_validation_data)
 
@@ -100,7 +100,7 @@ rcorrcens(Surv(DFStimes,DFSstatus) ~ predict(model_DFS, newdata = external_valid
 model_OS_extern_val <- cph(Surv(OStimes,OSstatus)~predict(model_OS, newdata = external_validation_data), x = T, y = T, surv = T,time.inc = 60, data = external_validation_data)
 rcorrcens(Surv(OStimes,OSstatus) ~ predict(model_OS, newdata = external_validation_data), data = external_validation_data)
 
-#Codes for calibration curve of the nomogram
+##Codes for calibration curve of the nomogram
 model_DFS_24 <- cph(Surv(DFStimes,DFSstatus) ~ Tstage+Nstage+Mstage+MTMS, data = training_data, x = T, y = T, surv = T, time.inc = 24)
 model_DFS_36 <- cph(Surv(DFStimes,DFSstatus) ~ Tstage+Nstage+Mstage+MTMS, data = training_data, x = T, y = T, surv = T, time.inc = 36)
 model_DFS_60 <- cph(Surv(DFStimes,DFSstatus) ~ Tstage+Nstage+Mstage+MTMS, data = training_data, x = T, y = T, surv = T, time.inc = 60)
