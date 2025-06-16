@@ -152,3 +152,71 @@ dca(Surv(OStimes,OSstatus) ~ pr_failuref1+pr_failuref2+ pr_failuref3,
                       thresholds = 1:100 / 100) %>%
   plot(smooth = T)
 
+#Codes for time-independent ROC curve and AUROC comparison in training cohort
+library(survivalROC)
+library(timeROC)
+library(survival)
+
+y1<-Surv(training_data$DFStimes, training_data$DFSstatus)
+model_1_DFS<-coxph(formula=y1~MTMS+Tstage+Nstage+Mstage, data= training_data)
+p1=predict(model_1_DFS,type="lp")
+model_2_DFS <-coxph(formula=y1~ Tstage+Nstage+Mstage+ Differentiation_status,data= training_data)
+p2=predict(model_2_DFS,type="lp")
+model_3_DFS <-coxph(formula=y1~ TNMstage,data= training_data)
+p3=predict(model_3_DFS,type="lp")
+roc_model_1_DFS=survivalROC(Stime= training_data $DFStimes,status= training_data $DFSstatus,marker=p1,predict.time=60,method="KM")
+roc_model_2_DFS =survivalROC(Stime= training_data $DFStimes,status= training_data $DFSstatus,marker=p2,predict.time=60,method="KM")
+roc_model_3_DFS =survivalROC(Stime= training_data $DFStimes,status= training_data $DFSstatus,marker=p3,predict.time=60,method="KM")
+plot(roc_model_1_DFS $FP, roc_model_1_DFS $TP,type="l",xlab="False positive rate",ylab="True positive rate",col="#E53528",main="Time dependent ROC",lwd=2)
+par(new=T)
+plot(roc_model_2_DFS $FP, roc_model_2_DFS $TP,type="l",xlab="False positive rate",ylab="True positive rate",col="#193E8F",main="Time dependent ROC",lwd=2)
+par(new=T)
+plot(roc_model_3_DFS $FP, roc_model_3_DFS $TP,type="l",xlab="False positive rate",ylab="True positive rate",col="#F09739",main="Time dependent ROC",lwd=2)
+timeroc_model_1_DFS<-timeROC(T= training_data $DFStimes,delta= training_data$ DFSstatus,marker= p1,
+           cause=1,weighting="marginal",
+           times=c(60),
+           iid=TRUE,ROC=TRUE) 
+timeroc_model_1_DFS
+confint(timeroc_model_1_DFS)$CI_AUC
+timeroc_model_2_DFS <-timeROC(T= training_data $DFStimes,delta= training_data$ DFSstatus,marker= p2,
+           cause=1,weighting="marginal",
+           times=c(60),
+           iid=TRUE,ROC=TRUE) 
+timeroc_model_2_DFS 
+confint(timeroc_model_2_DFS)$CI_AUC
+
+timeroc_model_3_DFS <-timeROC(T= training_data$ DFStimes,delta= training_data$ DFSstatus,marker= p3,
+           cause=1,weighting="marginal",
+           times=c(60),
+           iid=TRUE,ROC=TRUE) 
+timeroc_model_3_DFS 
+confint(timeroc_model_3_DFS)$CI_AUC
+compare(timeroc_model_1_DFS, timeroc_model_2_DFS)
+compare(timeroc_model_1_DFS, timeroc_model_3_DFS)
+
+y1<-Surv(training_data$OStimes, training_data$OSstatus)
+model_1_OS<-coxph(formula=y1~MTMS+Tstage+Nstage+Mstage, data= training_data)
+p1=predict(model_1_OS,type="lp")
+model_2_OS <-coxph(formula=y1~ Tstage+Nstage+Mstage+ Differentiation_status,data= training_data)
+p2=predict(model_2_OS,type="lp")
+model_3_OS <-coxph(formula=y1~ TNMstage,data= training_data)
+p3=predict(model_3_OS,type="lp")
+roc_model_1_OS=survivalROC(Stime= training_data $OStimes,status= training_data $OSstatus,marker=p1,predict.time=60,method="KM")
+roc_model_2_OS =survivalROC(Stime= training_data $OStimes,status= training_data $OSstatus,marker=p2,predict.time=60,method="KM")
+roc_model_3_OS =survivalROC(Stime= training_data $OStimes,status= training_data $OSstatus,marker=p3,predict.time=60,method="KM")
+plot(roc_model_1_OS $FP, roc_model_1_OS $TP,type="l",xlab="False positive rate",ylab="True positive rate",col="#E53528",main="Time dependent ROC",lwd=2)
+par(new=T)
+plot(roc_model_2_OS $FP, roc_model_2_OS $TP,type="l",xlab="False positive rate",ylab="True positive rate",col="#193E8F",main="Time dependent ROC",lwd=2)
+par(new=T)
+plot(roc_model_3_OS $FP, roc_model_3_OS $TP,type="l",xlab="False positive rate",ylab="True positive rate",col="#F09739",main="Time dependent ROC",lwd=2)
+timeroc_model_1_OS<-timeROC(T= training_data $OStimes,delta= training_data$ OSstatus,marker= p1,
+           cause=1,weighting="marginal",
+           times=c(60),
+           iid=TRUE,ROC=TRUE) 
+timeroc_model_1_OS
+confint(timeroc_model_1_OS)$CI_AUC
+timeroc_model_2_OS <-timeROC(T= training_data $OStimes,delta= training_data$ OSstatus,marker= p2,
+           cause=1,weighting="marginal",
+           times=c(60),
+           iid=TRUE,ROC=TRUE) 
+timeroc_model_2_OS 
